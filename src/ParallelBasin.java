@@ -1,20 +1,18 @@
-import java.util.concurrent.RecursiveTask;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.RecursiveAction;
 
-public class ParallelBasin extends RecursiveTask<List>
+
+public class ParallelBasin extends RecursiveAction
 {
     int columns;
     int rows;
     int lo;
     int hi;
-    float[] array;
+    boolean[] array;
     static final int SEQUENTIAL_CUTOFF=500;
-    List<String> basins = new ArrayList<String>();
-    HashMap<String, Float> grid;
+    //List<String> basins = new ArrayList<String>();
+    float[][] grid;
 
-    ParallelBasin(float[] array, int lo, int hi, int columns, int rows, HashMap grid)
+    ParallelBasin(boolean[] array, int lo, int hi, int columns, int rows, float[][] grid)
     {
         this.array = array;
         this.lo = lo;
@@ -24,52 +22,59 @@ public class ParallelBasin extends RecursiveTask<List>
         this.grid = grid;
     }
 
-    protected List<String> compute()
+    @Override
+    protected void compute() 
     {
-        System.out.println("we are lamming");
-        if((hi-lo)<SEQUENTIAL_CUTOFF)
-       {
+        if((hi-lo)< SEQUENTIAL_CUTOFF)
+        {
+            int columnCount = 0;
+            int rowCount = 0;
             for(int i = lo; i<hi; i++)
             {
-                int rowPos = i/(columns-3);
-                int colPos = i%(columns-3);
-                String key = String.join(" ",Integer.toString(rowPos),Integer.toString(colPos));
-                
-                if(grid.get(String.join(" ",Integer.toString(rowPos-1),Integer.toString(colPos-1))) - grid.get(key) > 0.01 
-                    && grid.get(String.join(" ",Integer.toString(rowPos-1),Integer.toString(colPos))) - grid.get(key) > 0.01 
-                    && grid.get(String.join(" ",Integer.toString(rowPos-1),Integer.toString(colPos+1))) - grid.get(key) > 0.01)
+                if (columnCount +1 == columns)
                 {
-                    if(grid.get(String.join(" ",Integer.toString(rowPos),Integer.toString(colPos-1))) - grid.get(key) > 0.01 
-                        && grid.get(String.join(" ",Integer.toString(rowPos),Integer.toString(colPos+1))) - grid.get(key) > 0.01)
+                    if(!(rowCount==0 || columnCount == 0 || rowCount==(rows-1) || columnCount==(columns-1)))
                     {
-                        if(grid.get(String.join(" ",Integer.toString(rowPos+1),Integer.toString(colPos-1))) - grid.get(key) > 0.01 
-                            && grid.get(String.join(" ",Integer.toString(rowPos+1),Integer.toString(colPos))) - grid.get(key) > 0.01 
-                            && grid.get(String.join(" ",Integer.toString(rowPos+1),Integer.toString(colPos+1))) - grid.get(key) > 0.01)
+                        if(grid[rowCount-1][columnCount-1] - grid[rowCount][columnCount]>= 0.01 && grid[rowCount-1][columnCount] - grid[rowCount][columnCount] >= 0.01 
+                        && grid[rowCount-1][columnCount+1] - grid[rowCount][columnCount] >= 0.01 && grid[rowCount][columnCount-1] - grid[rowCount][columnCount] >= 0.01 
+                        && grid[rowCount][columnCount+1] - grid[rowCount][columnCount] >= 0.01 && grid[rowCount+1][columnCount-1] - grid[rowCount][columnCount] >= 0.01 
+                        && grid[rowCount+1][columnCount] - grid[rowCount][columnCount] >= 0.01 && grid[rowCount+1][columnCount+1] - grid[rowCount][columnCount] >= 0.01 )
                         {
-                            basins.add(key);
+                            array[i] = true;
                         }
                     }
+                    columnCount = 0;
+                    rowCount += 1;
                 }
-
-
+                else
+                {
+                    if(!(rowCount==0 || columnCount == 0 || rowCount==(rows-1) || columnCount==(columns-1)))
+                    {
+                        if(grid[rowCount-1][columnCount-1] - grid[rowCount][columnCount]>= 0.01 && grid[rowCount-1][columnCount] - grid[rowCount][columnCount] >= 0.01 
+                        && grid[rowCount-1][columnCount+1] - grid[rowCount][columnCount] >= 0.01 && grid[rowCount][columnCount-1] - grid[rowCount][columnCount] >= 0.01 
+                        && grid[rowCount][columnCount+1] - grid[rowCount][columnCount] >= 0.01 && grid[rowCount+1][columnCount-1] - grid[rowCount][columnCount] >= 0.01 
+                        && grid[rowCount+1][columnCount] - grid[rowCount][columnCount] >= 0.01 && grid[rowCount+1][columnCount+1] - grid[rowCount][columnCount] >= 0.01 )
+                        {
+                            array[i] = true;
+                        }
+                    }
+                    columnCount += 1;
+                }
             }
-            return basins;
-
-       }
-       else
-       {
-           ParallelBasin left = new ParallelBasin(array, lo, (hi+lo)/2, columns, rows, grid);
-           ParallelBasin right = new ParallelBasin(array, (hi+lo)/2, hi, columns, rows, grid);
-           
-           left.fork();
-           List<String> rightAns = right.compute();
-           List<String> leftAns = left.join();
-           
-           List<String> combinedAns = new ArrayList<String>(rightAns);
-           combinedAns.addAll(leftAns);
-           return combinedAns;
-       }
+        }
+        else
+        {
+            ParallelBasin left = new ParallelBasin(array, lo, (hi+lo)/2, columns, rows, grid);
+            ParallelBasin right = new ParallelBasin(array, (hi+lo)/2, hi, columns, rows, grid);
+            left.fork();
+            right.compute();
+            left.join();
+        }
+    
     }
+
+    
+    
 
 
 }

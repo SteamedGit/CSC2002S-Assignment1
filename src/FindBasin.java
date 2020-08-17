@@ -5,6 +5,7 @@ import java.util.List;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.Buffer;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.concurrent.ForkJoinPool;
@@ -14,57 +15,63 @@ public class FindBasin
 {
     static int columns;
     static int rows;
-    static HashMap<String, Float> grid;
+    static float[][]grid;
+    static List<String> basinList;
     static final ForkJoinPool fjpool = new ForkJoinPool();
     public static void main(String[] args) throws FileNotFoundException, IOException
     {
-        FileReader file = new FileReader("small_in.txt");   //text file location hardcoded for now will come up with a better implementation
+        FileReader file = new FileReader("large_in.txt");   //text file location hardcoded for now will come up with a better implementation
         BufferedReader br = new BufferedReader(file);               //this code creates a hashmap to store points as a string (key) and an associated float height (value)
         String firstLine = br.readLine();
         rows = Integer.parseInt(firstLine.split(" ")[0]);
         columns = Integer.parseInt(firstLine.split(" ")[1]);
         grid = createGrid(br);
-        //List<String> basinList = sequentialBasinFinder();
-        int arrayIndex = 0;
-        float array[] = new float[(rows-1)*(columns-1)];
+        boolean gridBasinStatus[] = new boolean[rows*columns];
+        basinList = new ArrayList<String>();
         
-        for(int i = 1; i<(rows-1); i++)
+        for(int i = 0; i<gridBasinStatus.length; i++)
         {
-            for(int n=1; n<(columns-1); n++)
+            gridBasinStatus[i] = false;
+        }
+        //sequentialBasinFinder();
+        parallelBasinFinder(gridBasinStatus);
+        
+        for(int i = 0; i<rows; i++)
+        {
+            for(int n = 0; n<columns; n++)
             {
-                array[arrayIndex] = grid.get(String.join(" ",Integer.toString(i), Integer.toString(n)));
-                arrayIndex += arrayIndex;
+               if(gridBasinStatus[(i*columns)+n] == true)
+               {
+                   basinList.add(String.join(" ", Integer.toString(i), Integer.toString(n)));
+               }
             }
         }
-        List<String> basinList = parallelBasinFinder(array);
-        
+
         System.out.println(basinList.size());
-        
         for(String basin : basinList)
         {
-          System.out.println(basin);
-        } 
+            System.out.println(basin);
+        }
+
+
     }
-   
-    private static HashMap createGrid(BufferedReader br) throws IOException
+    private static float[][] createGrid(BufferedReader br) throws IOException
     {
-        HashMap<String, Float> grid = new HashMap<String, Float>();
+        float[][] grid = new float[rows][columns];
         String[] values = br.readLine().split(" ");
         int columnCount = 0;
         int rowCount = 0;
-        for (int entry = 0; entry<(rows*columns); entry++)
+        for(String value : values)
         {
-            if(columnCount+1  == columns)
+            if(columnCount + 1 == columns)
             {
-                String coords = String.join(" ", Integer.toString(rowCount), Integer.toString(columnCount));
-                grid.put(coords, Float.parseFloat(values[entry]));
-                columnCount = 0;
+                grid[rowCount][columnCount] = Float.parseFloat(value);
+                columnCount= 0;
                 rowCount += 1;
             }
             else
             {
-                String coords = String.join(" ", Integer.toString(rowCount), Integer.toString(columnCount));
-                grid.put(coords, Float.parseFloat(values[entry]));
+                grid[rowCount][columnCount] = Float.parseFloat(value);
                 columnCount += 1;
             }
         }
@@ -72,44 +79,30 @@ public class FindBasin
         return grid;
     }
 
-    private static List sequentialBasinFinder()
+    private static void sequentialBasinFinder(boolean gridBasinStatus[])
     {
-        List<String> basinList = new ArrayList<String>();
-        for(int i = 1; i<(rows-1); i++)
+        for(int i = 0; i<(rows); i++)
         {
-            for(int n = 1; n<(columns-1); n++)
+            for(int n = 0; n<(columns); n++)
             {
-                if(grid.get(String.join(" ",Integer.toString(i-1),Integer.toString(n-1))) - grid.get(String.join(" ",Integer.toString(i), Integer.toString(n))) > 0.01 
-                    && grid.get(String.join(" ",Integer.toString(i-1),Integer.toString(n))) - grid.get(String.join(" ",Integer.toString(i), Integer.toString(n))) > 0.01 
-                    && grid.get(String.join(" ",Integer.toString(i-1),Integer.toString(n+1))) - grid.get(String.join(" ",Integer.toString(i), Integer.toString(n))) > 0.01  )
+                if(!(i==0 || n == 0 || i==(rows-1) || n==(columns-1)))
                 {
-                    if(grid.get(String.join(" ",Integer.toString(i),Integer.toString(n-1))) - grid.get(String.join(" ",Integer.toString(i), Integer.toString(n))) >0.01
-                        && grid.get(String.join(" ",Integer.toString(i),Integer.toString(n+1))) - grid.get(String.join(" ",Integer.toString(i), Integer.toString(n))) > 0.01)
-                        {
-                            if(grid.get(String.join(" ",Integer.toString(i+1),Integer.toString(n-1))) - grid.get(String.join(" ",Integer.toString(i), Integer.toString(n))) > 0.01
-                                && grid.get(String.join(" ",Integer.toString(i+1),Integer.toString(n))) - grid.get(String.join(" ",Integer.toString(i), Integer.toString(n))) > 0.01
-                                && grid.get(String.join(" ",Integer.toString(i+1),Integer.toString(n+1))) - grid.get(String.join(" ",Integer.toString(i), Integer.toString(n))) > 0.01)
-                            {
-                                String basinCoords = String.join(" ", Integer.toString(i), Integer.toString(n));
-                                basinList.add(basinCoords);
-                            }
-                        }                   
-
+                    if(grid[i-1][n-1] - grid[i][n]>= 0.01 && grid[i-1][n] - grid[i][n] >= 0.01 
+                    && grid[i-1][n+1] - grid[i][n] >= 0.01 && grid[i][n-1] - grid[i][n] >= 0.01 
+                    && grid[i][n+1] - grid[i][n] >= 0.01 && grid[i+1][n-1] - grid[i][n] >= 0.01 
+                    && grid[i+1][n] - grid[i][n] >= 0.01 && grid[i+1][n+1] - grid[i][n] >= 0.01 )
+                    {
+                        gridBasinStatus[((i*columns)+n)] =  true;
+                    }
+                
+                    
                 }
             }
         }
-        return basinList;
-    }
+    } 
 
-    public static HashMap getGrid()
+    private static void parallelBasinFinder(boolean array[])
     {
-        return grid;
+        fjpool.invoke(new ParallelBasin(array, 0, array.length, columns, rows, grid));
     }
-
-    public static List<String> parallelBasinFinder(float[] array)
-    {
-        System.out.println("we are lamming");
-        return fjpool.invoke(new ParallelBasin(array, 0, array.length, columns, rows, grid));
-    }
-
 }

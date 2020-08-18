@@ -1,4 +1,6 @@
-import java.util.HashMap;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,22 +22,36 @@ public class FindBasin
     static final ForkJoinPool fjpool = new ForkJoinPool();
     public static void main(String[] args) throws FileNotFoundException, IOException
     {
-        FileReader file = new FileReader("small_in.txt");   //text file location hardcoded for now will come up with a better implementation
-        BufferedReader br = new BufferedReader(file);               //this code creates a hashmap to store points as a string (key) and an associated float height (value)
-        String firstLine = br.readLine();
-        rows = Integer.parseInt(firstLine.split(" ")[0]);
-        columns = Integer.parseInt(firstLine.split(" ")[1]);
-        grid = createGrid(br);
-        boolean gridBasinStatus[] = new boolean[rows*columns];
-        basinList = new ArrayList<String>();
         
-        for(int i = 0; i<gridBasinStatus.length; i++)
+        if(args.length == 0 || args.length > 2) // will change to 2 for output file
         {
-            gridBasinStatus[i] = false;
+            System.out.println("Use one argument that specifies file path.");
         }
-        //sequentialBasinFinder();
-        parallelBasinFinder(gridBasinStatus);
-        basinExtraction(gridBasinStatus);
+        else if(args.length == 2) // will change to 2 for output file
+        {
+            FileReader file = new FileReader(args[0]);   //text file location hardcoded for now will come up with a better implementation
+            File fileOut = new File(args[1]);
+            fileOut.createNewFile();
+            FileWriter fw = new FileWriter(fileOut);
+            BufferedWriter bw = new BufferedWriter(fw);
+            BufferedReader br = new BufferedReader(file);               //this code creates a hashmap to store points as a string (key) and an associated float height (value)
+            String firstLine = br.readLine();
+            rows = Integer.parseInt(firstLine.split(" ")[0]);
+            columns = Integer.parseInt(firstLine.split(" ")[1]);
+            grid = createGrid(br);
+            boolean gridBasinStatus[] = new boolean[rows*columns];
+            basinList = new ArrayList<String>();
+            
+            for(int i = 0; i<gridBasinStatus.length; i++)
+            {
+                gridBasinStatus[i] = false;
+            }
+            //sequentialBasinFinder();
+            parallelBasinFinder(gridBasinStatus);
+            basinExtraction(gridBasinStatus, bw);
+        }
+        
+        
 
 
     }
@@ -90,7 +106,7 @@ public class FindBasin
         fjpool.invoke(new ParallelBasin(array, 0, array.length, columns, rows, 0, 0, grid));
     }
 
-    private static void basinExtraction(boolean[] gridBasinStatus)
+    private static void basinExtraction(boolean[] gridBasinStatus, BufferedWriter bw) throws IOException
     {
         for(int i = 0; i<rows; i++)
         {
@@ -103,11 +119,16 @@ public class FindBasin
             }
         }
 
-        System.out.println(basinList.size());
+        //System.out.println(basinList.size());
+        bw.write(Integer.toString(basinList.size()));
+        bw.newLine();
         for(String basin : basinList)
         {
-            System.out.println(basin);
+            //System.out.println(basin);
+            bw.write(basin);
+            bw.newLine();
         }
+        bw.close();
 
     }
 }

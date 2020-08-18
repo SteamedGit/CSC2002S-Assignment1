@@ -20,7 +20,7 @@ public class FindBasin
     static final ForkJoinPool fjpool = new ForkJoinPool();
     public static void main(String[] args) throws FileNotFoundException, IOException
     {
-        FileReader file = new FileReader("large_in.txt");   //text file location hardcoded for now will come up with a better implementation
+        FileReader file = new FileReader("small_in.txt");   //text file location hardcoded for now will come up with a better implementation
         BufferedReader br = new BufferedReader(file);               //this code creates a hashmap to store points as a string (key) and an associated float height (value)
         String firstLine = br.readLine();
         rows = Integer.parseInt(firstLine.split(" ")[0]);
@@ -35,23 +35,7 @@ public class FindBasin
         }
         //sequentialBasinFinder();
         parallelBasinFinder(gridBasinStatus);
-        
-        for(int i = 0; i<rows; i++)
-        {
-            for(int n = 0; n<columns; n++)
-            {
-               if(gridBasinStatus[(i*columns)+n] == true)
-               {
-                   basinList.add(String.join(" ", Integer.toString(i), Integer.toString(n)));
-               }
-            }
-        }
-
-        System.out.println(basinList.size());
-        for(String basin : basinList)
-        {
-            System.out.println(basin);
-        }
+        basinExtraction(gridBasinStatus);
 
 
     }
@@ -103,6 +87,27 @@ public class FindBasin
 
     private static void parallelBasinFinder(boolean array[])
     {
-        fjpool.invoke(new ParallelBasin(array, 0, array.length, columns, rows, grid));
+        fjpool.invoke(new ParallelBasin(array, 0, array.length, columns, rows, 0, 0, grid));
+    }
+
+    private static void basinExtraction(boolean[] gridBasinStatus)
+    {
+        for(int i = 0; i<rows; i++)
+        {
+            for(int n = 0; n<columns; n++)
+            {
+               if(gridBasinStatus[(i*columns)+n] == true)
+               {
+                   basinList.add(String.join(" ", Integer.toString(i), Integer.toString(n)));
+               }
+            }
+        }
+
+        System.out.println(basinList.size());
+        for(String basin : basinList)
+        {
+            System.out.println(basin);
+        }
+
     }
 }

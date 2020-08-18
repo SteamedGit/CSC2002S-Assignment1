@@ -3,6 +3,8 @@ import java.util.concurrent.RecursiveAction;
 
 public class ParallelBasin extends RecursiveAction
 {
+    int colPosition; 
+    int rowPosition;
     int columns;
     int rows;
     int lo;
@@ -12,13 +14,15 @@ public class ParallelBasin extends RecursiveAction
     //List<String> basins = new ArrayList<String>();
     float[][] grid;
 
-    ParallelBasin(boolean[] array, int lo, int hi, int columns, int rows, float[][] grid)
+    ParallelBasin(boolean[] array, int lo, int hi, int columns, int rows, int colPosition, int rowPosition, float[][] grid)
     {
         this.array = array;
         this.lo = lo;
         this.hi = hi;
         this.columns = columns;
         this.rows = rows;
+        this.colPosition = colPosition;
+        this.rowPosition = rowPosition;
         this.grid = grid;
     }
 
@@ -27,8 +31,8 @@ public class ParallelBasin extends RecursiveAction
     {
         if((hi-lo)< SEQUENTIAL_CUTOFF)
         {
-            int columnCount = 0;
-            int rowCount = 0;
+            int columnCount = colPosition;
+            int rowCount = rowPosition;
             for(int i = lo; i<hi; i++)
             {
                 if (columnCount +1 == columns)
@@ -64,8 +68,8 @@ public class ParallelBasin extends RecursiveAction
         }
         else
         {
-            ParallelBasin left = new ParallelBasin(array, lo, (hi+lo)/2, columns, rows, grid);
-            ParallelBasin right = new ParallelBasin(array, (hi+lo)/2, hi, columns, rows, grid);
+            ParallelBasin left = new ParallelBasin(array, lo, (hi+lo)/2, columns, rows, colPosition, rowPosition, grid);
+            ParallelBasin right = new ParallelBasin(array, (hi+lo)/2, hi, columns, rows, ((hi+lo)/2)%columns, ((hi+lo)/2)/columns, grid);
             left.fork();
             right.compute();
             left.join();

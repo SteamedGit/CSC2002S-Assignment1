@@ -19,7 +19,8 @@ public class FindBasin
     static int rows;
     static float[][]grid;
     static List<String> basinList;
-    static final ForkJoinPool fjpool = new ForkJoinPool();
+    static final ForkJoinPool fjpoolBasin = new ForkJoinPool();
+    static final ForkJoinPool fjpoolExtraction = new ForkJoinPool();
     public static void main(String[] args) throws FileNotFoundException, IOException
     {
         
@@ -49,11 +50,11 @@ public class FindBasin
            
             long startTime = System.currentTimeMillis();
             parallelBasinFinder(gridBasinStatus);
-            //sequentialBasinFinder(gridBasinStatus);
             long elapsedTime = System.currentTimeMillis() - startTime;
-            //float elapsedTimeMilli = elapsedTime;
             System.out.println(elapsedTime);
-            basinExtraction(gridBasinStatus, bw);
+            //sequentialBasinExtraction(gridBasinStatus);
+            parallelBasinExtraction(gridBasinStatus);
+            basinWriter(bw);
         }
 
         else if(args.length == 3)
@@ -86,16 +87,10 @@ public class FindBasin
                 double total = 0;
                 for(long time : times)
                 {
-                    //System.out.println(time);
                     System.out.println(((double)time)/1000000);
                     total += time;
                 }
-                Arrays.sort(times);
-                double minTime = (((double)times[0])/1000000);
-                double maxTime = (((double)times[numIterations-1])/1000000);
-                System.out.println("Min in ms: "  + Double.toString(minTime));
-                System.out.println("Max in ms: "  + Double.toString(maxTime));
-                System.out.println("Average in ms: " + Double.toString(total/(numIterations*1000000)));
+                timingResults(total, times, numIterations);
             }
 
             else if(args[0].equals("pt"))
@@ -111,16 +106,10 @@ public class FindBasin
                 double total = 0;
                 for(long time : times)
                 {
-                    //System.out.println(time);
                     System.out.println(((double)time)/1000000);
                     total += time;
                 }
-                Arrays.sort(times);
-                double minTime = (((double)times[0])/1000000);
-                double maxTime = (((double)times[numIterations-1])/1000000);
-                System.out.println("Min in ms: "  + Double.toString(minTime));
-                System.out.println("Max in ms: "  + Double.toString(maxTime));
-                System.out.println("Average in ms: " + Double.toString(total/(numIterations*1000000)));
+                timingResults(total, times, numIterations);
             }
 
         }
@@ -176,10 +165,10 @@ public class FindBasin
 
     private static void parallelBasinFinder(boolean array[])
     {
-        fjpool.invoke(new ParallelBasin(array, 0, array.length, columns, rows, 0, 0, grid));
+        fjpoolBasin.invoke(new ParallelBasin(array, 0, array.length, columns, rows, 0, 0, grid));
     }
 
-    private static void basinExtraction(boolean[] gridBasinStatus, BufferedWriter bw) throws IOException
+    private static void sequentialBasinExtraction(boolean[] gridBasinStatus)
     {
         for(int i = 0; i<rows; i++)
         {
@@ -191,17 +180,33 @@ public class FindBasin
                }
             }
         }
+    }
+   
+    private static void parallelBasinExtraction(boolean gridBasinStatus[])
+    {
+        fjpoolExtraction.invoke(new  ParallelExtraction(gridBasinStatus, 0, gridBasinStatus.length, columns, rows, 0, 0, basinList));
+    }
 
-        //System.out.println(basinList.size());
+    private static void basinWriter(BufferedWriter bw) throws  IOException
+    {
         bw.write(Integer.toString(basinList.size()));
         bw.newLine();
         for(String basin : basinList)
         {
-            //System.out.println(basin);
             bw.write(basin);
             bw.newLine();
         }
         bw.close();
 
+    }
+
+    private static void timingResults(double total, long[] times, int numIterations)
+    {
+        Arrays.sort(times);
+        double minTime = (((double)times[0])/1000000);
+        double maxTime = (((double)times[numIterations-1])/1000000);
+        System.out.println("Min in ms: "  + Double.toString(minTime));
+        System.out.println("Max in ms: "  + Double.toString(maxTime));
+        System.out.println("Average in ms: " + Double.toString(total/(numIterations*1000000)));
     }
 }

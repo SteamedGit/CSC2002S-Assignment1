@@ -11,7 +11,6 @@ public class ParallelBasin extends RecursiveAction
     int hi;
     boolean[] array;
     static final int SEQUENTIAL_CUTOFF=500;
-    //List<String> basins = new ArrayList<String>();
     float[][] grid;
 
     ParallelBasin(boolean[] array, int lo, int hi, int columns, int rows, int colPosition, int rowPosition, float[][] grid)

@@ -13,5 +13,8 @@ clean:
 	rm $(BINDIR)/*.class
 
 run:
-	java -cp bin FindBasin "med_in.txt" "test_out.txt"
+	java -cp bin FindBasin "large_in.txt" "test_out.txt"
+runTests:
+	java -cp bin FindBasin "st" "large_in.txt" "50"
+	java -cp bin FindBasin "pt" "large_in.txt" "50"
 

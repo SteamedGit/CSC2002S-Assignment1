@@ -23,18 +23,18 @@ public class FindBasin
     public static void main(String[] args) throws FileNotFoundException, IOException
     {
         
-        if(args.length == 0 || args.length > 2) // will change to 2 for output file
+        if(args.length > 3 || args.length<2) // will change to 2 for output file
         {
-            System.out.println("Use one argument that specifies file path.");
+            System.out.println("Incorrect Input!");
         }
         else if(args.length == 2) // will change to 2 for output file
         {
-            FileReader file = new FileReader(args[0]);   //text file location hardcoded for now will come up with a better implementation
+            FileReader file = new FileReader(args[0]);   
             File fileOut = new File(args[1]);
             fileOut.createNewFile();
             FileWriter fw = new FileWriter(fileOut);
             BufferedWriter bw = new BufferedWriter(fw);
-            BufferedReader br = new BufferedReader(file);               //this code creates a hashmap to store points as a string (key) and an associated float height (value)
+            BufferedReader br = new BufferedReader(file);               
             String firstLine = br.readLine();
             rows = Integer.parseInt(firstLine.split(" ")[0]);
             columns = Integer.parseInt(firstLine.split(" ")[1]);
@@ -46,13 +46,86 @@ public class FindBasin
             {
                 gridBasinStatus[i] = false;
             }
-            //sequentialBasinFinder();
+           
+            long startTime = System.currentTimeMillis();
             parallelBasinFinder(gridBasinStatus);
+            //sequentialBasinFinder(gridBasinStatus);
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            //float elapsedTimeMilli = elapsedTime;
+            System.out.println(elapsedTime);
             basinExtraction(gridBasinStatus, bw);
         }
-        
-        
 
+        else if(args.length == 3)
+        {
+            FileReader file = new FileReader(args[1]);   
+            int numIterations = Integer.parseInt(args[2]);
+            BufferedReader br = new BufferedReader(file);               
+            String firstLine = br.readLine();
+            rows = Integer.parseInt(firstLine.split(" ")[0]);
+            columns = Integer.parseInt(firstLine.split(" ")[1]);
+            grid = createGrid(br);
+            boolean gridBasinStatus[] = new boolean[rows*columns];
+            basinList = new ArrayList<String>();
+            
+            for(int i = 0; i<gridBasinStatus.length; i++)
+            {
+                gridBasinStatus[i] = false;
+            }
+        
+            if(args[0].equals("st"))
+            {
+                System.gc();
+                long[] times =  new long[numIterations];
+                for(int i = 0; i<numIterations; i++)
+                {
+                    long startTime = System.nanoTime();
+                    sequentialBasinFinder(gridBasinStatus);
+                    times[i] = (System.nanoTime() - startTime);
+                }
+                double total = 0;
+                for(long time : times)
+                {
+                    //System.out.println(time);
+                    System.out.println(((double)time)/1000000);
+                    total += time;
+                }
+                Arrays.sort(times);
+                double minTime = (((double)times[0])/1000000);
+                double maxTime = (((double)times[numIterations-1])/1000000);
+                System.out.println("Min in ms: "  + Double.toString(minTime));
+                System.out.println("Max in ms: "  + Double.toString(maxTime));
+                System.out.println("Average in ms: " + Double.toString(total/(numIterations*1000000)));
+            }
+
+            else if(args[0].equals("pt"))
+            {
+                System.gc();
+                long[] times =  new long[numIterations];
+                for(int i = 0; i<numIterations; i++)
+                {
+                    long startTime = System.nanoTime();
+                    parallelBasinFinder(gridBasinStatus);
+                    times[i] = (System.nanoTime() - startTime);
+                }
+                double total = 0;
+                for(long time : times)
+                {
+                    //System.out.println(time);
+                    System.out.println(((double)time)/1000000);
+                    total += time;
+                }
+                Arrays.sort(times);
+                double minTime = (((double)times[0])/1000000);
+                double maxTime = (((double)times[numIterations-1])/1000000);
+                System.out.println("Min in ms: "  + Double.toString(minTime));
+                System.out.println("Max in ms: "  + Double.toString(maxTime));
+                System.out.println("Average in ms: " + Double.toString(total/(numIterations*1000000)));
+            }
+
+        }
+        
+    
 
     }
     private static float[][] createGrid(BufferedReader br) throws IOException

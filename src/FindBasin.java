@@ -18,56 +18,65 @@ public class FindBasin
     static int columns;
     static int rows;
     static float[][]grid;
-    static List<String> basinList;
+    static String[] basinArray;
+    static int basinArrayCounter;
     static final ForkJoinPool fjpoolBasin = new ForkJoinPool();
     static final ForkJoinPool fjpoolExtraction = new ForkJoinPool();
     public static void main(String[] args) throws FileNotFoundException, IOException
     {
         
-        if(args.length > 3 || args.length<2) // will change to 2 for output file
+        if(args.length > 4 || args.length<3) // will change to 2 for output file
         {
             System.out.println("Incorrect Input!");
         }
-        else if(args.length == 2) // will change to 2 for output file
+        else if(args.length == 4) // will change to 2 for output file
         {
-            FileReader file = new FileReader(args[0]);   
-            File fileOut = new File(args[1]);
-            fileOut.createNewFile();
-            FileWriter fw = new FileWriter(fileOut);
-            BufferedWriter bw = new BufferedWriter(fw);
-            BufferedReader br = new BufferedReader(file);               
+            BufferedReader br  = createReader(args[0]);
+            BufferedWriter bw = createWriter(args[1]);             
             String firstLine = br.readLine();
             rows = Integer.parseInt(firstLine.split(" ")[0]);
             columns = Integer.parseInt(firstLine.split(" ")[1]);
             grid = createGrid(br);
             boolean gridBasinStatus[] = new boolean[rows*columns];
-            basinList = new ArrayList<String>();
+            basinArray = new String[(rows*columns)];
+            basinArrayCounter = 0;
             
             for(int i = 0; i<gridBasinStatus.length; i++)
             {
                 gridBasinStatus[i] = false;
             }
-           
-            long startTime = System.currentTimeMillis();
-            parallelBasinFinder(gridBasinStatus);
-            long elapsedTime = System.currentTimeMillis() - startTime;
-            System.out.println(elapsedTime);
-            //sequentialBasinExtraction(gridBasinStatus);
-            parallelBasinExtraction(gridBasinStatus);
+
+            if(args[2].equals("sFind"))
+            {
+                sequentialBasinFinder(gridBasinStatus);
+            }
+            else if(args[2].equals("pFind"))
+            {
+                parallelBasinFinder(gridBasinStatus);
+            }
+
+            if(args[3].equals("sExtract"))
+            {
+                sequentialBasinExtraction(gridBasinStatus);
+            }
+            else if(args[3].equals("pExtract"))
+            {
+                parallelBasinExtraction(gridBasinStatus);
+            }
             basinWriter(bw);
         }
 
         else if(args.length == 3)
-        {
-            FileReader file = new FileReader(args[1]);   
-            int numIterations = Integer.parseInt(args[2]);
-            BufferedReader br = new BufferedReader(file);               
+        {   
+            int numIterations = Integer.parseInt(args[2]); 
+            BufferedReader br = createReader(args[1]);            
             String firstLine = br.readLine();
             rows = Integer.parseInt(firstLine.split(" ")[0]);
             columns = Integer.parseInt(firstLine.split(" ")[1]);
             grid = createGrid(br);
             boolean gridBasinStatus[] = new boolean[rows*columns];
-            basinList = new ArrayList<String>();
+            basinArray = new String[(rows*columns)];
+            basinArrayCounter = 0;
             
             for(int i = 0; i<gridBasinStatus.length; i++)
             {
@@ -113,10 +122,9 @@ public class FindBasin
             }
 
         }
-        
-    
-
     }
+
+
     private static float[][] createGrid(BufferedReader br) throws IOException
     {
         float[][] grid = new float[rows][columns];
@@ -140,6 +148,23 @@ public class FindBasin
         br.close();
         return grid;
     }
+
+    private static BufferedReader createReader(String filePath) throws IOException
+    {
+        FileReader file = new FileReader(filePath); 
+        BufferedReader br =  new BufferedReader(file);
+        return br;
+    }
+
+    private static BufferedWriter createWriter(String filePath) throws IOException
+    {
+        File fileOut = new File(filePath);
+        fileOut.createNewFile();
+        FileWriter fw = new FileWriter(fileOut);
+        BufferedWriter bw = new BufferedWriter(fw);
+        return bw;
+    }
+
 
     private static void sequentialBasinFinder(boolean gridBasinStatus[])
     {
@@ -176,7 +201,7 @@ public class FindBasin
             {
                if(gridBasinStatus[(i*columns)+n] == true)
                {
-                   basinList.add(String.join(" ", Integer.toString(i), Integer.toString(n)));
+                   basinArray[(i*columns)+n] = String.join(" ", Integer.toString(i), Integer.toString(n));
                }
             }
         }
@@ -184,20 +209,29 @@ public class FindBasin
    
     private static void parallelBasinExtraction(boolean gridBasinStatus[])
     {
-        fjpoolExtraction.invoke(new  ParallelExtraction(gridBasinStatus, 0, gridBasinStatus.length, columns, rows, 0, 0, basinList));
+        fjpoolExtraction.invoke(new  ParallelExtraction(gridBasinStatus, 0, gridBasinStatus.length, columns, rows, 0, 0, basinArray));
     }
 
     private static void basinWriter(BufferedWriter bw) throws  IOException
     {
-        bw.write(Integer.toString(basinList.size()));
-        bw.newLine();
-        for(String basin : basinList)
+        for(int i = 0; i<basinArray.length; i++)
         {
-            bw.write(basin);
-            bw.newLine();
+            if(basinArray[i] != null)
+            {
+                basinArrayCounter+=1;
+            }
+        }
+        bw.write(Integer.toString(basinArrayCounter));
+        bw.newLine();
+        for(int i = 0; i<basinArray.length; i++)
+        {
+            if(basinArray[i] != null)
+            {
+                bw.write(basinArray[i]);
+                bw.newLine();
+            }
         }
         bw.close();
-
     }
 
     private static void timingResults(double total, long[] times, int numIterations)

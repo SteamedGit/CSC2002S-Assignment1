@@ -13,9 +13,9 @@ clean:
 	rm $(BINDIR)/*.class
 
 run:
-	java -cp bin FindBasin "data/large_in.txt" "test_out.txt"
+	java -cp bin FindBasin "data/med_in.txt" "test_out.txt" "pFind" "pExtract"
 runTests:
-	java -cp bin FindBasin "pt" "data/large_in.txt" "50" > "large_PARALLEL_180000.txt"
+	java -cp bin FindBasin "pt" "data/large_in.txt" "50"
 
 run600:
 	java -cp bin FindBasin "pt" "data/large_in.txt" "50" > "large_PARALLEL_600.txt"

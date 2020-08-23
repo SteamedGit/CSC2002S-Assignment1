@@ -10,7 +10,7 @@ public class ParallelBasin extends RecursiveAction
     int lo;
     int hi;
     boolean[] array;
-    static final int SEQUENTIAL_CUTOFF=500;
+    static final int SEQUENTIAL_CUTOFF=4800;
     float[][] grid;
 
     ParallelBasin(boolean[] array, int lo, int hi, int columns, int rows, int colPosition, int rowPosition, float[][] grid)
@@ -75,9 +75,4 @@ public class ParallelBasin extends RecursiveAction
         }
     
     }
-
-    
-    
-
-
 }

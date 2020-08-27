@@ -25,7 +25,7 @@ public class FindBasin
     public static void main(String[] args) throws FileNotFoundException, IOException
     {
         
-        if(args.length > 4 || args.length<3) // will change to 2 for output file
+        if(args.length > 4 || args.length<2) // will change to 2 for output file
         {
             System.out.println("Incorrect Input!");
         }
@@ -66,9 +66,10 @@ public class FindBasin
             basinWriter(bw);
         }
 
-        else if(args.length == 3)
+        else if(args.length == 3 || args.length == 2)
         {   
-            int numIterations = Integer.parseInt(args[2]); 
+            //int numIterations = Integer.parseInt(args[2]); 
+            int numIterations = 50;
             BufferedReader br = createReader(args[1]);            
             String firstLine = br.readLine();
             rows = Integer.parseInt(firstLine.split(" ")[0]);
@@ -105,6 +106,8 @@ public class FindBasin
             else if(args[0].equals("pt"))
             {
                 System.gc();
+                int cutoff = Integer.parseInt(args[2]);
+                ParallelBasin.setSequentialCutoff(cutoff);
                 long[] times =  new long[numIterations];
                 for(int i = 0; i<numIterations; i++)
                 {
@@ -168,7 +171,7 @@ public class FindBasin
 
     private static void sequentialBasinFinder(boolean gridBasinStatus[])
     {
-        for(int i = 0; i<(rows); i++)
+        /*for(int i = 0; i<(rows); i++)
         {
             for(int n = 0; n<(columns); n++)
             {
@@ -184,6 +187,40 @@ public class FindBasin
                 
                     
                 }
+            }
+        } */
+        int columnCount = 0;
+        int rowCount = 0;
+        for (int i = 0; i<gridBasinStatus.length; i++)
+        {
+            if (columnCount +1 == columns)
+            {
+                if(!(rowCount==0 || columnCount == 0 || rowCount==(rows-1) || columnCount==(columns-1)))
+                {
+                    if(grid[rowCount-1][columnCount-1] - grid[rowCount][columnCount]>= 0.01 && grid[rowCount-1][columnCount] - grid[rowCount][columnCount] >= 0.01 
+                    && grid[rowCount-1][columnCount+1] - grid[rowCount][columnCount] >= 0.01 && grid[rowCount][columnCount-1] - grid[rowCount][columnCount] >= 0.01 
+                    && grid[rowCount][columnCount+1] - grid[rowCount][columnCount] >= 0.01 && grid[rowCount+1][columnCount-1] - grid[rowCount][columnCount] >= 0.01 
+                    && grid[rowCount+1][columnCount] - grid[rowCount][columnCount] >= 0.01 && grid[rowCount+1][columnCount+1] - grid[rowCount][columnCount] >= 0.01 )
+                    {
+                        gridBasinStatus[i] = true;
+                    }
+                }
+                columnCount = 0;
+                rowCount += 1;
+            }
+            else
+            {
+                if(!(rowCount==0 || columnCount == 0 || rowCount==(rows-1) || columnCount==(columns-1)))
+                {
+                    if(grid[rowCount-1][columnCount-1] - grid[rowCount][columnCount]>= 0.01 && grid[rowCount-1][columnCount] - grid[rowCount][columnCount] >= 0.01 
+                    && grid[rowCount-1][columnCount+1] - grid[rowCount][columnCount] >= 0.01 && grid[rowCount][columnCount-1] - grid[rowCount][columnCount] >= 0.01 
+                    && grid[rowCount][columnCount+1] - grid[rowCount][columnCount] >= 0.01 && grid[rowCount+1][columnCount-1] - grid[rowCount][columnCount] >= 0.01 
+                    && grid[rowCount+1][columnCount] - grid[rowCount][columnCount] >= 0.01 && grid[rowCount+1][columnCount+1] - grid[rowCount][columnCount] >= 0.01 )
+                    {
+                        gridBasinStatus[i] = true;
+                    }
+                }
+                columnCount += 1;
             }
         }
     } 

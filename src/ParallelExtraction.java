@@ -1,5 +1,9 @@
 import java.util.concurrent.RecursiveAction;
 import java.util.List;
+/**
+ * This class extracts basins from a 1D array of values and inserts their coordinates into a 1D array of Strings.
+ * @author HTGTIM001
+ */
 
 public class ParallelExtraction extends RecursiveAction
 {
@@ -25,6 +29,11 @@ public class ParallelExtraction extends RecursiveAction
         this.basinArray = basinArray;
     }
 
+    /**
+     * Uses much of the same code as the ParallelBasin class with regards to converting between 1D and 2D 
+     * coordinates. To extract each basin a true value is looked for and when found the corresponding coordinates 
+     * are added to the String array.
+     */
     @Override
     protected void compute() 
     {

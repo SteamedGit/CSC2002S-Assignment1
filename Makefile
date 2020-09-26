@@ -2,6 +2,7 @@ JAVAC=/usr/bin/javac
 .SUFFIXES: .java .class
 SRCDIR=src
 BINDIR=bin
+DOCDIR=doc
 
 $(BINDIR)/%.class:$(SRCDIR)/%.java
 	$(JAVAC) -d $(BINDIR)/ -cp $(BINDIR) $<
@@ -45,4 +46,6 @@ run80000:
 	java -cp bin FindBasin "pt" "data/large_in.txt" "80000" 
 runSeq:
 	java -cp bin FindBasin "st" "data/large_in.txt" "50"
+docs:
+	javadoc -d $(DOCDIR) src/*.java
 

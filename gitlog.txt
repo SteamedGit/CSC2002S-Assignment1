@@ -1,0 +1,59 @@
+commit 5bc7d9da65abbb92524a74dea8782e3ebdd9bcc5
+Author: SteamedGit <timothyhitge@gmail.com>
+Date:   Thu Aug 27 18:29:13 2020 +0200
+
+    All code is finalised.
+
+commit c6d5c4e59bca4b779f8cab2b75450487e06edd67
+Author: SteamedGit <timothyhitge@gmail.com>
+Date:   Sun Aug 23 18:32:35 2020 +0200
+
+    ParallelExtract is working. Cleaned up code and created methods for duplicated blocks of code.
+
+commit 0e8c8865a72ef1e469099add85844e4a4cdc716b
+Author: SteamedGit <timothyhitge@gmail.com>
+Date:   Sat Aug 22 18:42:15 2020 +0200
+
+    Sequential cutoffs found. Started Parallel Extraction, lists are not thread safe!
+
+commit f3a65e63053f793e33131c0b97b793dfc87424c2
+Author: SteamedGit <timothyhitge@gmail.com>
+Date:   Sat Aug 22 13:59:34 2020 +0200
+
+    Timing is setup correctly.
+
+commit 641510412636d9d32c1ff2b0a2aba559b1d54cd0
+Author: SteamedGit <timothyhitge@gmail.com>
+Date:   Tue Aug 18 13:19:01 2020 +0200
+
+    Removed .class files
+
+commit 75c6cebf648b16ff6bcc6ac6076a7cf0b20bea83
+Author: SteamedGit <timothyhitge@gmail.com>
+Date:   Tue Aug 18 13:18:06 2020 +0200
+
+    Added .gitignore
+
+commit 4049a7e866e20b10f886a06bedbdbf1dc1dbd74c
+Author: SteamedGit <timothyhitge@gmail.com>
+Date:   Tue Aug 18 13:14:28 2020 +0200
+
+    Can write to files now
+
+commit 18a73ee3d07d9e3bc9bd6fdb851b823e4647dec3
+Author: SteamedGit <timothyhitge@gmail.com>
+Date:   Tue Aug 18 12:27:15 2020 +0200
+
+    Parallel solution is correct. Still need to benchmark and clean up code.
+
+commit 19c23152c0c101aa1217465d166b8991e74539ec
+Author: SteamedGit <timothyhitge@gmail.com>
+Date:   Mon Aug 17 23:13:00 2020 +0200
+
+    Sequential solution reworked to multi-pass, parallel solution not working with the 1d boolean array
+
+commit e8f10d3c3bb065e13766afc1634ffb73f31946f9
+Author: SteamedGit <timothyhitge@gmail.com>
+Date:   Sat Aug 15 18:55:09 2020 +0200
+
+    First commit

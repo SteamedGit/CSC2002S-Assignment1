@@ -11,7 +11,12 @@ import java.nio.Buffer;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.concurrent.ForkJoinPool;
-
+/**
+ * This class allows the user to use the ParallelBasin and ParallelExtraction classes to find and extract basins
+ * from a 2D grid of height values. Additonally,it allows the user to benchmark the basin classification process. 
+ * It also includes sequential methods that do the same thing for the purposes of comparison when benchmarking.
+ * @author HTGTIM001
+ */
 
 public class FindBasin
 {
@@ -22,14 +27,23 @@ public class FindBasin
     static int basinArrayCounter;
     static final ForkJoinPool fjpoolBasin = new ForkJoinPool();
     static final ForkJoinPool fjpoolExtraction = new ForkJoinPool();
+    /**
+     * This main method manages user import and either finds and extracts basins or benchmarks finding basins.
+     * The data file from which the grid is constructed is expected to have its dimensions on its first line and 
+     * all of its values on its second line.
+     * Various options are specificied through args, see the README for specifics.
+     * @param args
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
     public static void main(String[] args) throws FileNotFoundException, IOException
     {
         
-        if(args.length > 4 || args.length<2) // will change to 2 for output file
+        if(args.length > 4 || args.length<2) 
         {
             System.out.println("Incorrect Input!");
         }
-        else if(args.length == 4) // will change to 2 for output file
+        else if(args.length == 4) 
         {
             BufferedReader br  = createReader(args[0]);
             BufferedWriter bw = createWriter(args[1]);             
@@ -67,8 +81,7 @@ public class FindBasin
         }
 
         else if(args.length == 3 || args.length == 2)
-        {   
-            //int numIterations = Integer.parseInt(args[2]); 
+        {    
             int numIterations = 50;
             BufferedReader br = createReader(args[1]);            
             String firstLine = br.readLine();
@@ -127,7 +140,13 @@ public class FindBasin
         }
     }
 
-
+    /**
+     * Creates a 2D grid of float values by reading them in from a bufferedreader.
+     * The function expects all values to be stored on one line.
+     * @param br
+     * @return float[][]
+     * @throws IOException
+     */
     private static float[][] createGrid(BufferedReader br) throws IOException
     {
         float[][] grid = new float[rows][columns];
@@ -152,6 +171,12 @@ public class FindBasin
         return grid;
     }
 
+    /**
+     * Creates a BufferedReader from the specified filepath.
+     * @param filePath
+     * @return BufferedReader
+     * @throws IOException
+     */
     private static BufferedReader createReader(String filePath) throws IOException
     {
         FileReader file = new FileReader(filePath); 
@@ -159,6 +184,12 @@ public class FindBasin
         return br;
     }
 
+    /**
+     * Crates a BufferedWriter from the specified filepath.
+     * @param filePath
+     * @return BufferedWriter
+     * @throws IOException
+     */
     private static BufferedWriter createWriter(String filePath) throws IOException
     {
         File fileOut = new File(filePath);
@@ -168,27 +199,13 @@ public class FindBasin
         return bw;
     }
 
-
+    /**
+     * Sequentially finds basins in a 2D grid and stores that classification in a 1D array of boolean values.
+     * @param gridBasinStatus
+     * 
+     */
     private static void sequentialBasinFinder(boolean gridBasinStatus[])
     {
-        /*for(int i = 0; i<(rows); i++)
-        {
-            for(int n = 0; n<(columns); n++)
-            {
-                if(!(i==0 || n == 0 || i==(rows-1) || n==(columns-1)))
-                {
-                    if(grid[i-1][n-1] - grid[i][n]>= 0.01 && grid[i-1][n] - grid[i][n] >= 0.01 
-                    && grid[i-1][n+1] - grid[i][n] >= 0.01 && grid[i][n-1] - grid[i][n] >= 0.01 
-                    && grid[i][n+1] - grid[i][n] >= 0.01 && grid[i+1][n-1] - grid[i][n] >= 0.01 
-                    && grid[i+1][n] - grid[i][n] >= 0.01 && grid[i+1][n+1] - grid[i][n] >= 0.01 )
-                    {
-                        gridBasinStatus[((i*columns)+n)] =  true;
-                    }
-                
-                    
-                }
-            }
-        } */
         int columnCount = 0;
         int rowCount = 0;
         for (int i = 0; i<gridBasinStatus.length; i++)
@@ -224,12 +241,22 @@ public class FindBasin
             }
         }
     } 
-
+    /**
+     * Invokes the Fork Join Pool for the ParallelBasin class.
+     * @param array
+     * 
+     */
     private static void parallelBasinFinder(boolean array[])
     {
         fjpoolBasin.invoke(new ParallelBasin(array, 0, array.length, columns, rows, 0, 0, grid));
     }
 
+    /**
+     * Sequentially extracts basins from a 1D array of boolean values and stores their coordinates in an array
+     * of strings.
+     * @param gridBasinStatus
+     * 
+     */
     private static void sequentialBasinExtraction(boolean[] gridBasinStatus)
     {
         for(int i = 0; i<rows; i++)
@@ -244,11 +271,22 @@ public class FindBasin
         }
     }
    
+    /**
+     * Invokes the Fork Join Pool for the ParallelExtraction class.
+     * @param gridBasinStatus
+     * 
+     */
     private static void parallelBasinExtraction(boolean gridBasinStatus[])
     {
         fjpoolExtraction.invoke(new  ParallelExtraction(gridBasinStatus, 0, gridBasinStatus.length, columns, rows, 0, 0, basinArray));
     }
 
+    /**
+     * Writes the basins to a file using a BufferedWriter.
+     * @param bw
+     * @throws IOException
+     * 
+     */
     private static void basinWriter(BufferedWriter bw) throws  IOException
     {
         for(int i = 0; i<basinArray.length; i++)
@@ -270,7 +308,13 @@ public class FindBasin
         }
         bw.close();
     }
-
+    /**
+     * Sorts an array of times and calculates its mean, min and max.
+     * @param total
+     * @param times
+     * @param numIterations
+     * 
+     */
     private static void timingResults(double total, long[] times, int numIterations)
     {
         Arrays.sort(times);

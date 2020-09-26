@@ -1,1 +1,6 @@
 *.class
+*.pdf
+*.zip
+*.doc
+README.txt
+gitlog.txt

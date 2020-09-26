@@ -31,12 +31,12 @@ have heights that are greater than its by 0.01m or more.
 
  
 ### Find Alorithms
-"sFind" - Sequential Algorithm
-"pFind" - Parallel Algorithm 
+<p>"sFind" - Sequential Algorithm
+"pFind" - Parallel Algorithm</p>
 
 ### Extraction
-"sExtract" - Sequential Extraction
-"pExtract" - Parallel Extraction
+<p>"sExtract" - Sequential Extraction
+"pExtract" - Parallel Extraction</p>
 
 ### To benchmark the parallel algorithm
 <code> java -cp bin FindBasin "pt" \<data file path> \<Sequential cutoff> </code>

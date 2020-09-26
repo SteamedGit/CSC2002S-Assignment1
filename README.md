@@ -26,8 +26,8 @@ have heights that are greater than its by 0.01m or more.
 
 ## How to use 
 
-To simply run the program use:
-java -cp bin FindBasin <data> <output> <find algorithm> <type of extraction>
+To simply run the program use:</br>
+>java -cp bin FindBasin <data> <output> <find algorithm> <type of extraction>
  
 Find Alorithms:
 sFind - Sequential Algorithm

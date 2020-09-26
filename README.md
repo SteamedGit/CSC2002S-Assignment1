@@ -14,11 +14,12 @@ Points on the edge are not considered because they do not have a full ring of ne
 
 ### Example: A 4x4 grid
 
-   (0)   (1)   (2)  (3)
-(0) 1.00 0.90 0.95 0.80
-(1) 1.00 0.95 0.90 0.80
-(2) 0.85 0.60 0.80 0.75
-(3) 1.00 1.00 1.00 1.00
+|     | (0)  | (1)  | (2)  | (3)  |
+|-----|------|------|------|------|
+| (0) | 1.00 | 0.90 | 0.95 | 0.80 |
+| (1) | 1.00 | 0.95 | 0.90 | 0.80 |
+| (2) | 0.85 | 0.60 | 0.80 | 0.75 |
+| (3) | 1.00 | 1.00 | 1.00 | 1.00 |
 
 The only basin in this grid is at (2,1); all of its neighbours {1.00, 0.95, 0.90, 0.85, 0.80, 1.00, 1.00, 1.00} 
 have heights that are greater than its by 0.01m or more.

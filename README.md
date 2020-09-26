@@ -26,22 +26,22 @@ have heights that are greater than its by 0.01m or more.
 
 ## How to use 
 
-To simply run the program use:</br>
+###To simply run the program use
 <code> java -cp bin FindBasin \<data> \<output> \<find algorithm> \<type of extraction> </code>
 
  
-Find Alorithms:
+###Find Alorithms
 "sFind" - Sequential Algorithm
 "pFind" - Parallel Algorithm 
 
-Extraction 
+###Extraction
 "sExtract" - Sequential Extraction
 "pExtract" - Parallel Extraction
 
-To benchmark the parallel algorithm:
+###To benchmark the parallel algorithm
 <code> java -cp bin FindBasin "pt" \<data file path> \<Sequential cutoff> </code>
 
-To benchmark the sequential program:
+###To benchmark the sequential program
 <code> java -cp bin FindBasin "st" \<data file path> </code>
 
 ## Documentation

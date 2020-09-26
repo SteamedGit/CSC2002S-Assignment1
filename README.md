@@ -31,11 +31,11 @@ have heights that are greater than its by 0.01m or more.
 
  
 ### Find Alorithms
-<p>"sFind" - Sequential Algorithm
+<p>"sFind" - Sequential Algorithm<br>
 "pFind" - Parallel Algorithm</p>
 
 ### Extraction
-<p>"sExtract" - Sequential Extraction
+<p>"sExtract" - Sequential Extraction<br>
 "pExtract" - Parallel Extraction</p>
 
 ### To benchmark the parallel algorithm

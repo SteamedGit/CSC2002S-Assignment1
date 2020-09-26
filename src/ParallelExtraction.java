@@ -1,10 +1,14 @@
 import java.util.concurrent.RecursiveAction;
 import java.util.List;
+/**
+ * This class extracts basins from a 1D array of values and inserts their coordinates into a 1D array of Strings.
+ * @author HTGTIM001
+ */
 
 public class ParallelExtraction extends RecursiveAction
 {
     boolean[] gridBasinStatus;
-    List<String> basinList;
+    String[] basinArray;
     int rows;
     int columns;
     int hi;
@@ -13,7 +17,7 @@ public class ParallelExtraction extends RecursiveAction
     int rowPosition;
     static final int SEQUENTIAL_CUTOFF = 500;
     
-    ParallelExtraction(boolean[] gridBasinStatus, int lo, int hi, int columns, int rows, int colPosition, int rowPosition, List<String> basinList)
+    ParallelExtraction(boolean[] gridBasinStatus, int lo, int hi, int columns, int rows, int colPosition, int rowPosition, String[] basinArray)
     {
         this.gridBasinStatus = gridBasinStatus;
         this.lo = lo;
@@ -22,9 +26,14 @@ public class ParallelExtraction extends RecursiveAction
         this.rows = rows;
         this.colPosition = colPosition;
         this.rowPosition = rowPosition;
-        this.basinList = basinList;
+        this.basinArray = basinArray;
     }
 
+    /**
+     * Uses much of the same code as the ParallelBasin class with regards to converting between 1D and 2D 
+     * coordinates. To extract each basin a true value is looked for and when found the corresponding coordinates 
+     * are added to the String array.
+     */
     @Override
     protected void compute() 
     {
@@ -38,7 +47,7 @@ public class ParallelExtraction extends RecursiveAction
                 {
                     if(gridBasinStatus[(rowCount*columns)+columnCount] == true)
                     {
-                        basinList.add(String.join(" ", Integer.toString(rowCount), Integer.toString(columnCount)));
+                        basinArray[i] = String.join(" ", Integer.toString(rowCount), Integer.toString(columnCount));
                     }
                     columnCount = 0;
                     rowCount += 1;
@@ -47,7 +56,7 @@ public class ParallelExtraction extends RecursiveAction
                 {
                     if(gridBasinStatus[(rowCount*columns)+columnCount] == true)
                     {
-                        basinList.add(String.join(" ", Integer.toString(rowCount), Integer.toString(columnCount)));
+                        basinArray[i] = String.join(" ", Integer.toString(rowCount), Integer.toString(columnCount));
                     }
                     columnCount += 1;
                 }
@@ -55,8 +64,8 @@ public class ParallelExtraction extends RecursiveAction
         }
         else
         {
-            ParallelExtraction left = new ParallelExtraction(gridBasinStatus, lo, (hi+lo)/2, columns, rows, colPosition, rowPosition, basinList);
-            ParallelExtraction right = new ParallelExtraction(gridBasinStatus, (hi+lo)/2, hi, columns, rows, ((hi+lo)/2)%columns, ((hi+lo)/2)/columns, basinList);
+            ParallelExtraction left = new ParallelExtraction(gridBasinStatus, lo, (hi+lo)/2, columns, rows, colPosition, rowPosition, basinArray);
+            ParallelExtraction right = new ParallelExtraction(gridBasinStatus, (hi+lo)/2, hi, columns, rows, ((hi+lo)/2)%columns, ((hi+lo)/2)/columns, basinArray);
             left.fork();
             right.compute();
             left.join();

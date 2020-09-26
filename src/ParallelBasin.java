@@ -1,5 +1,9 @@
 import java.util.concurrent.RecursiveAction;
-
+/***
+ * This class classifies basins and nonbasins in a grid of height values from a 2D array of floats and 
+ * stores their basin status in a 1D boolean array.
+ * @author HTGTIM001
+ */
 
 public class ParallelBasin extends RecursiveAction
 {
@@ -10,7 +14,7 @@ public class ParallelBasin extends RecursiveAction
     int lo;
     int hi;
     boolean[] array;
-    static final int SEQUENTIAL_CUTOFF=500;
+    static int SEQUENTIAL_CUTOFF = 500;
     float[][] grid;
 
     ParallelBasin(boolean[] array, int lo, int hi, int columns, int rows, int colPosition, int rowPosition, float[][] grid)
@@ -25,6 +29,22 @@ public class ParallelBasin extends RecursiveAction
         this.grid = grid;
     }
 
+    /**
+     * Used to set the sequential cutoff from inside another class.
+     * @param cutoff
+     */
+    public static void setSequentialCutoff(int cutoff)
+    {
+        SEQUENTIAL_CUTOFF = cutoff;
+    }
+
+    /**
+     * Classifies basins and nonbasins in the 2D grid and stores the classification in a 1D array.
+     * All gridpoints on the edges of the terrain are not considered. The relative positions around 
+     * a gridpoint are constant, thus from the 2D coordinates of the gridpoint we can access all of its 
+     * neighbours. If all of the neighbours have a height values greater by 0.01m or more, then the gridpoint 
+     * is classified as a basin.
+     */
     @Override
     protected void compute() 
     {
@@ -75,9 +95,4 @@ public class ParallelBasin extends RecursiveAction
         }
     
     }
-
-    
-    
-
-
 }

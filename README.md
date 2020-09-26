@@ -39,10 +39,10 @@ have heights that are greater than its by 0.01m or more.
 "pExtract" - Parallel Extraction</p>
 
 ### To benchmark the parallel algorithm
-<code> java -cp bin FindBasin "pt" \<data file path> \<sequential cutoff> </code>
+<code> java -cp bin FindBasin "pt" \<text data file> \<sequential cutoff> </code>
 
 ### To benchmark the sequential program
-<code> java -cp bin FindBasin "st" \<data file path> </code>
+<code> java -cp bin FindBasin "st" \<text data file> </code>
 
 ## Documentation
 

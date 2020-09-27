@@ -51,5 +51,5 @@ Further information regarding all the code can be found in the docs folder which
 ## Known issues
 
 When the basin has a relative height deficit of exactly 0.01, it is not classified as a basin. This is a floating-point precision
-issue. This assignment explicitly required the use of floating point numbers and thus this issue it not considered to be significant.
+issue. This assignment explicitly required the use of floating point numbers and thus this issue is not considered to be significant.
 For exact precision, *BigDecimal* is a more appropriate choice.
